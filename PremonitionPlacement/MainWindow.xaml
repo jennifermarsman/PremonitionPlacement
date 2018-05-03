@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PremonitionPlacement"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="768" Width="1024">
     <Grid>
         <Image Name="img" HorizontalAlignment="Left" Height="256" Margin="20,20,0,0" VerticalAlignment="Top" Width="256"/>
         <Button Name="btnFindOptimalPlacement" Content="Position" HorizontalAlignment="Left" Margin="353,147,0,0" VerticalAlignment="Top" Width="75" Click="btnFindOptimalPlacement_Click"/>
         <Button Name="btnOpen" Content="Open" HorizontalAlignment="Left" Margin="353,86,0,0" VerticalAlignment="Top" Width="75" Click="btnBrowse_Click"/>
+        <Image Name="classifiedImg" HorizontalAlignment="Left" Height="256" Margin="552,20,0,0" VerticalAlignment="Top" Width="256"/>
 
     </Grid>
 </Window>

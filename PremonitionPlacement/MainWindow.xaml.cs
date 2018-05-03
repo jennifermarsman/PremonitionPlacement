@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -61,10 +62,11 @@ namespace PremonitionPlacement
         private async void btnFindOptimalPlacement_Click(object sender, RoutedEventArgs e)
         {
             // Call the AI for Earth land cover API
-            byte[] returnImage = await AIforEarthLandCoverMappingAnalyze(imageFilePath);
+            Bitmap returnImage = await AIforEarthLandCoverMappingAnalyze(imageFilePath);
+            classifiedImg.Source = ConvertBitmapToBitmapImage(returnImage);
 
             // Using the land cover information, find the optimal spot to place Project Premonition traps.  
-            FindBestPlacement(returnImage); 
+            //FindBestPlacement(returnImage); 
         }
 
         /// <summary>
@@ -75,10 +77,10 @@ namespace PremonitionPlacement
         /// the AI for Earth land cover APIs.)
         /// </summary>
         /// <param name="x"></param>
-        private void FindBestPlacement(byte[] x)
+        private void FindBestPlacement(Bitmap img)
         {
-            // TODO: change type of x
             // Find points where water and trees meet
+            // TODO: start here
 
             // Otherwise find place where water meets non-water
 
@@ -90,12 +92,12 @@ namespace PremonitionPlacement
         }
 
         /// <summary>
-        /// Analyze the ESRI NAIP image file using the AI for Earth Land Cover Mapping REST API.
+        /// Classify the ESRI NAIP image file using the AI for Earth Land Cover Mapping REST API.
         /// </summary>
-        /// <param name="imageFilePath">image file.</param>
-        static async Task<byte[]> AIforEarthLandCoverMappingAnalyze(string imageFilePath)
+        /// <param name="imageFilePath">ESRI NAIP image file</param>
+        static async Task<Bitmap> AIforEarthLandCoverMappingAnalyze(string imageFilePath)
         {
-            byte[] responseImage = null;
+            Bitmap bitmap = null;
 
             try
             {
@@ -123,9 +125,9 @@ namespace PremonitionPlacement
                     // Call the AI for Earth API
                     response = await client.PostAsync(uri, content);
                     Debug.WriteLine(response.GetType().ToString());
-                    //string str = await response.Content.ReadAsStringAsync();
-                    responseImage = await response.Content.ReadAsByteArrayAsync();
-                    
+                    Stream stream = await response.Content.ReadAsStreamAsync();
+                    bitmap = new Bitmap(stream);
+
                     // Show the response status code
                     Debug.WriteLine("RESPONSE: {0}", response.StatusCode);
                 }
@@ -135,20 +137,39 @@ namespace PremonitionPlacement
                 Debug.WriteLine(e.ToString());
             }
 
-            return responseImage;
+            return bitmap;
         }
-
 
         /// <summary>
         /// Returns the contents of the specified file as a byte array.
         /// </summary>
-        /// <param name="imageFilePath">Image file to read.</param>
-        /// <returns>Byte array of the image data.</returns>
+        /// <param name="imageFilePath">Image file to read</param>
+        /// <returns>Byte array of the image data</returns>
         static byte[] GetImageAsByteArray(string imageFilePath)
         {
             FileStream fileStream = new FileStream(imageFilePath, FileMode.Open, FileAccess.Read);
             BinaryReader binaryReader = new BinaryReader(fileStream);
             return binaryReader.ReadBytes((int)fileStream.Length);
+        }
+
+        /// <summary>
+        /// Converts a Bitmap to a BitmapImage
+        /// </summary>
+        /// <param name="bitmap">The bitmap to convert</param>
+        /// <returns>A BitmapImage generated from the provided Bitmap</returns>
+        static BitmapImage ConvertBitmapToBitmapImage(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+                return bitmapimage;
+            }
         }
 
     }
