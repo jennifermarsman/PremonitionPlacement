@@ -1,4 +1,4 @@
-# Premonition Placement
+i# Premonition Placement
 
 This code demonstrates calling the AI for Earth land cover API, in a use case involving Project Premonition. 
 
@@ -11,4 +11,4 @@ This demo makes use of the [AI for Earth Landcover](https://www.microsoft.com/en
 3. Add these subscription keys into the appropriate appSetting in the App.config file of the project. 
 4. This demo does not work with the Any CPU" setting in Visual Studio. If you have issues running this demo change the platform target to x86 or x64 by right clicking on the solution, then select "Configuration Manager", and set the "Active soultion platform" to x86 or x64.
 
-![AI for Earth Landcover Map](AIForEarthLandcoverMap.png)
+![AI for Earth Landcover Map](AiForEarthLandcoverMap.png)
