@@ -1,4 +1,4 @@
-i# Premonition Placement
+# Premonition Placement
 
 This code demonstrates calling the AI for Earth land cover API, in a use case involving Project Premonition. 
 
