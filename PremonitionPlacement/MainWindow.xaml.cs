@@ -56,7 +56,7 @@ namespace PremonitionPlacement
 
         #endregion
 
-        #region Construtor
+        #region Constructor
 
         public MainWindow()
         {
@@ -125,6 +125,7 @@ namespace PremonitionPlacement
         /// <param name="x"></param>
         private void FindBestPlacement(Bitmap img)
         {
+        /*
             var pixels = new List<System.Windows.Point>()
             {
                 //Test data
@@ -132,18 +133,120 @@ namespace PremonitionPlacement
                 new System.Windows.Point(80, 140),
                 new System.Windows.Point(235, 180),
             };
+          */ 
+
+            var pixels = new List<System.Windows.Point>();
+            var possibilities = new List<System.Windows.Point>();
+
+            // Colors of classification
+            System.Drawing.Color noData = System.Drawing.Color.FromArgb(0, 0, 0);
+            System.Drawing.Color water = System.Drawing.Color.FromArgb(0, 0, 255);
+            System.Drawing.Color trees = System.Drawing.Color.FromArgb(0, 127, 0);
+            System.Drawing.Color herbaceous = System.Drawing.Color.FromArgb(127, 255, 127);
+            System.Drawing.Color barren = System.Drawing.Color.FromArgb(127, 95, 95);
+
+            // We are not storing off "no data" or "barren" points because mosquitos 
+            // are unlikely to be found there.  
+            List<System.Windows.Point> waterPoints = new List<System.Windows.Point>();
+            List<System.Windows.Point> treePoints = new List<System.Windows.Point>();
+            List<System.Windows.Point> herbaceousPoints = new List<System.Windows.Point>();
 
             // Find points where water and trees meet
-            // TODO: start here
+            for (int i = 1; i < img.Width - 1; i++)
+            {
+                for (int j = 1; j < img.Height - 1; j++)
+                {
+                    System.Drawing.Color pixelColor = img.GetPixel(i, j);
+                    if (pixelColor.Equals(trees))
+                    {
+                        treePoints.Add(new System.Windows.Point(i, j));
 
-            // Otherwise find place where water meets non-water
+                        // Check for presence of water next to it
+                        if (img.GetPixel(i - 1, j - 1).Equals(water))
+                        {
+                            waterPoints.Add(new System.Windows.Point(i - 1, j - 1));
+                            possibilities.Add(new System.Windows.Point(i, j));
+                        }
+                        else if (img.GetPixel(i - 1, j).Equals(water))
+                        {
+                            waterPoints.Add(new System.Windows.Point(i - 1, j));
+                            possibilities.Add(new System.Windows.Point(i, j));
+                        }
+                        else if (img.GetPixel(i - 1, j + 1).Equals(water))
+                        {
+                            waterPoints.Add(new System.Windows.Point(i - 1, j + 1));
+                            possibilities.Add(new System.Windows.Point(i, j));
+                        }
+                        else if (img.GetPixel(i, j - 1).Equals(water))
+                        {
+                            waterPoints.Add(new System.Windows.Point(i, j - 1));
+                            possibilities.Add(new System.Windows.Point(i, j));
+                        }
+                        else if (img.GetPixel(i, j + 1).Equals(water))
+                        {
+                            waterPoints.Add(new System.Windows.Point(i, j + 1));
+                            possibilities.Add(new System.Windows.Point(i, j));
+                        }
+                        else if (img.GetPixel(i + 1, j - 1).Equals(water))
+                        {
+                            waterPoints.Add(new System.Windows.Point(i + 1, j - 1));
+                            possibilities.Add(new System.Windows.Point(i, j));
+                        }
+                        else if (img.GetPixel(i + 1, j).Equals(water))
+                        {
+                            waterPoints.Add(new System.Windows.Point(i + 1, j));
+                            possibilities.Add(new System.Windows.Point(i, j));
+                        }
+                        else if (img.GetPixel(i + 1, j + 1).Equals(water))
+                        {
+                            waterPoints.Add(new System.Windows.Point(i + 1, j + 1));
+                            possibilities.Add(new System.Windows.Point(i, j));
+                        }
+                    }
+                    else if (pixelColor.Equals(water))
+                    {
+                        waterPoints.Add(new System.Windows.Point(i, j));
+                    }
+                    else if (pixelColor.Equals(herbaceous))
+                    {
+                        herbaceousPoints.Add(new System.Windows.Point(i, j));
+                    }
+                }
+            }
 
-            // Otherwise find place in trees
+            Random rand = new Random(100); 
+            // If there is water next to trees, use that location first
+            if (possibilities.Count > 0)     
+            {
+                int r = rand.Next(possibilities.Count);
+                pixels.Add(possibilities[r]);
+            }
 
-            // Otherwise field (can't place trap in water or in buildings)
+            // Otherwise find place in trees.  (Choose a random value in treePoints)
+            else if (treePoints.Count > 0)
+            {
+                int r = rand.Next(treePoints.Count);
+                pixels.Add(treePoints[r]);
+            }
+
+            // Otherwise field (can't place trap in water or in buildings/on roads)
+            else if (herbaceousPoints.Count > 0)
+            {
+                int r = rand.Next(herbaceousPoints.Count);
+                pixels.Add(herbaceousPoints[r]);
+            }
+            
+            // Adjust pixels for scale factor
+            var scaledPixels = new List<System.Windows.Point>();
+            for (int i = 0; i < pixels.Count; i++)
+            {
+                System.Windows.Point p = new System.Windows.Point(pixels[i].X * 256 / img.Width, pixels[i].Y * 256 / img.Height);
+                scaledPixels.Add(p);
+            }
 
             //Display the traps on the map. Pass in the pixel of the image.
-            ShowTrapsOnMap(pixels);
+            ShowTrapsOnMap(scaledPixels);
+           
         }
 
         /// <summary>
