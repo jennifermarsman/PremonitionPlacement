@@ -13,6 +13,16 @@ This demo makes use of the [AI for Earth Land Cover](https://www.microsoft.com/e
 3. Add these subscription keys into the appropriate appSetting in the App.config file of the project. 
 4. This demo does not work with the "Any CPU" setting in Visual Studio. If you have issues running this demo, change the platform target to x86 or x64 by right-clicking on the solution, then select "Configuration Manager", and set the "Active solution platform" to x86 or x64.
 
+## Running the Demo
+Click the "Analyze Image" button, which will call the AI for Earth Land Cover API and determine the land cover types.  The logic will find the best place to put a mosquito trap, looking first for areas where water is close to trees (as mosquitos lay eggs in water and congregate in wooded areas), then areas with just trees, and finally fields/non-tree greenery.  The traps cannot go in the water or inside buildings/on roads.  A red pushpin will be placed in the optimal position for a Project Premonition smart mosquito trap.  Use the toggle at the top to switch between viewing the original satellite imagery or the classified results image on the map (powered by Azure Maps).  
+
+The colors in the classified images refer to the following:
++ No Data - black (0, 0 ,0)
++ Water - blue (0, 0, 255)
++ Trees - dark green (0, 128, 0)
++ Herbaceous - light green (128, 255, 128)
++ Barren/Impervious - brown (128, 96, 96)
+
 ## Resources
 + [AI for Earth website](http://aka.ms/aiforearth)
 + [AI for Earth land cover mapping](https://www.microsoft.com/en-us/aiforearth/land-cover-mapping.aspx)
